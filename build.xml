@@ -1,0 +1,25 @@
+<project name="vehiclesalecalculatortestsuite" basedir="." default="test">
+	<target name="init">
+		<mkdir dir="bin"/>
+	</target>
+	<target name="compile" depends="init">
+		<javac srcdir="src:generatedsrc" destdir="bin" includeantruntime="true" />
+		<copy todir="bin">
+		    <fileset dir="resources"/>
+		</copy>
+	</target>
+	<target name="test" depends="clean,compile">
+		<junit printsummary="yes" haltonfailure="yes">
+			<classpath>
+				<pathelement location="bin"/>
+			</classpath>
+			<formatter type="plain" usefile="false" />
+			<test name="dk.semler.ws.vehiclesalecalculator.v201412.testsuite.VehicleSaleCalculatorSuite" outfile="report">
+				<formatter type="xml" />
+			</test>
+		</junit>
+	</target>
+	<target name="clean">
+		<delete dir="bin" />
+	</target>
+</project>

@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="MESSAGE">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="RESPONSE" minOccurs="1" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:choice minOccurs="1" maxOccurs="1">
+								<xsd:group ref="responseGroup" minOccurs="1" maxOccurs="1" />
+								<xsd:element name="ERROR" type="ErrorType" minOccurs="1" maxOccurs="1" />
+							</xsd:choice>
+						</xsd:sequence>
+
+						<xsd:attribute name="DTD" type="xsd:string" use="required" fixed="VehicleSaleCalculator">
+							<xsd:annotation>
+								<xsd:documentation>The name of the service responding</xsd:documentation>
+							</xsd:annotation>
+						</xsd:attribute>
+						
+						<xsd:attribute name="NAME" type="xsd:string" use="required" fixed="CalculateNewVehicle">
+							<xsd:annotation>
+								<xsd:documentation>The name of the method responding</xsd:documentation>
+							</xsd:annotation>
+						</xsd:attribute>						
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:complexType name="ErrorDataType" mixed="true">
+		<xsd:sequence>
+			<xsd:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>	
+		<xsd:attribute type="xsd:string" name="ID" use="required"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="ErrorType">
+		<xsd:annotation>
+			<xsd:documentation>
+				CODE - DESCRIPTION
+				1200    Vehicle {VEHICLEID=String} does not exist                             
+				1201    Taxcode {TAXCODE=String} does not exist                               
+				1202    Price for Equipment or Color is missing in Autocore {MKDE=String}     
+				1203    Price for model / pricecode is missing in Autovore {COA815F=String}   
+				1204    PRNO {MKDE=String} is illegal                                         
+				1205    dealer profit may not be negative                              
+				1206    Rabat is too large, may not be higher than max. dealer profit {DEALERMAXDISCOUNT=String}  
+				1207    upholstery text does not exist 	
+                                1257    More than 60 Equipment/color codes			
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="TRANSACTIONID" minOccurs="1" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="13"></xsd:length>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="CODE" minOccurs="1" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="5"></xsd:length>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="DESCRIPTION" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="DATA" type="ErrorDataType" minOccurs="0" maxOccurs="unbounded" />			
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:group name="responseGroup">
+		<xsd:sequence>
+			<xsd:element name="TRANSACTIONID" minOccurs="1" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="13"></xsd:length>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="VEHICLE" minOccurs="1" maxOccurs="1" type="VEHICLEType"/>
+			<xsd:element name="CALCULATION" minOccurs="1" maxOccurs="1" type="CALCULATIONType"/>
+		</xsd:sequence>
+	</xsd:group>
+	
+	<xsd:complexType name="VEHICLEType">
+		<xsd:annotation>
+			<xsd:documentation>
+			
+			</xsd:documentation>
+		</xsd:annotation>	
+		<xsd:sequence>
+			<xsd:element name="COLORTEXT" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Text representation of the color code
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="40"/>		
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="INTERIORTEXT" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Text representation of the interior code
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="40"/>		
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="FUELTYPE" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Fuel type used by the vehicle
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="BENZIN"/>
+						<xsd:enumeration value="DIESEL"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="KILOMETERSPERLITER" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Fuel consumption per kilometer driven.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="5"/>
+						<xsd:fractionDigits value="2"/>		
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			
+			<xsd:element name="TAXCODE" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Tax Code
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="2"/>		
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			
+			<xsd:element name="FACTORYEQUIPMENT" minOccurs="0" maxOccurs="61" type="FACTORYEQUIPMENTType"/>
+		</xsd:sequence>
+	</xsd:complexType>			
+	
+	<xsd:complexType name="CALCULATIONType">
+		<xsd:annotation>
+			<xsd:documentation>
+			
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="DEALERPRICE" minOccurs="1" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Model sales price excluding tax and expenses (related to purchase of vehicle) 
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11"/>
+						<xsd:fractionDigits value="2"/>		
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="DEALERMARGIN" minOccurs="1" maxOccurs="1" type="PRICEType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Dealer Margin for this model including any equipment configured on the model
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+            
+            <xsd:element name="SALESPRICE" minOccurs="1" maxOccurs="1" type="PRICEType">
+				<xsd:annotation>
+					<xsd:documentation>
+						The sales price of the selected model 
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="TOTALPRICE" minOccurs="1" maxOccurs="1" type="PRICEType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Is a medium calculation of sums
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="VEHICLESOLDTODEALERPRICE" minOccurs="1" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Summarized total of the vehicle sold to dealer
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11"/>
+						<xsd:fractionDigits value="2"/>		
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="VEHICLESOLDTODEALERTOTALPRICE" minOccurs="1" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Summarized total of the vehicle sold to dealer with outstanding debt deducted
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11"/>
+						<xsd:fractionDigits value="2"/>		
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+
+			<xsd:element name="CUSTOMERDISCOUNT" minOccurs="1" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Discount amount
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11"/>
+						<xsd:fractionDigits value="2"/>		
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="GRANDTOTALPRICE" minOccurs="1" maxOccurs="1" type="PRICEType">
+				<xsd:annotation>
+					<xsd:documentation>
+						The grand total which the customer must pay.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DEALERMAXDISCOUNT" minOccurs="1" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Maximum discount / Dealer profit
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11"/>
+						<xsd:fractionDigits value="2"/>		
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+
+
+
+			<xsd:element name="MINIMUMSTANDARDPRICETOTAL" minOccurs="1" maxOccurs="1" type="PRICEType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Minimum standard pris for car and equipment 
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SECURITYEQUIPMENTDISCOUNT" minOccurs="1" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Deduction for security Equipment
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11"/>
+						<xsd:fractionDigits value="2"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="FUELREGULATION" minOccurs="1" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Deduction for fuel consumption	
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11"/>
+						<xsd:fractionDigits value="2"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="TAXEXCLREGULATIONS" minOccurs="1" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Tax minus Deduction for Security Equipment and Fuel Regulation. This tax includes equipment tax 	
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11"/>
+						<xsd:fractionDigits value="2"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="TAXEXCLREGULATIONSEXCLEQUIPMENT" minOccurs="1" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Tax minus Deduction for Security Equipment, Fuel Regulation and Customer Discount. 
+                                                This tax excludes equipment tax and is only for the base model 	
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11"/>
+						<xsd:fractionDigits value="2"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="FACTORYEQUIPMENTTOTALPRICE" minOccurs="1" maxOccurs="1" type="PRICEType">
+				<xsd:annotation>
+					<xsd:documentation>
+						This is a summarized total of the standard equipment and extra equipment.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="STANDARDEQUIPMENTTOTALPRICE" minOccurs="1" maxOccurs="1" type="PRICEType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Summarized total of the standard factory equipment.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="IMPORTERDEFINEDDEALEREQUIPMENTTOTALPRICE" minOccurs="1" maxOccurs="1" type="PRICEType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Summarized total of the importer defined dealer equipment.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="IMPORTERDEFINEDDEALEREQUIPMENTTOTALLISTPRICE" minOccurs="1" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Summarized list price total of the importer defined dealer equipment.
+						This total is always exclusive tax (not applicable for importer equipment) and vat. 
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="DEALEREQUIPMENTTOTALPRICE" minOccurs="1" maxOccurs="1" type="PRICEType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Summarized total of the dealer equipment.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EQUIPMENTPROVIDEDBYFACTORYTOTALPRICE" minOccurs="1" maxOccurs="1" type="PRICEType">
+				<xsd:annotation>
+					<xsd:documentation>
+						This is a summarized total of all the equipment provided by the factory.
+						Standard, factory, additional/extra equipment.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EQUIPMENTPROVIDEDBYDEALERTOTALPRICE" minOccurs="1" maxOccurs="1" type="PRICEType">
+				<xsd:annotation>
+					<xsd:documentation>
+						This is a summarized total of all the equipment provided by the dealer.
+						Importer defined and dealer equipment.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="TOTALVEHICLEPRICE" minOccurs="1" maxOccurs="1" type="PRICEType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Is a medium calculation of the car total price
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			
+			<xsd:element name="DEALERMARGINEXCLEQUIPMENT" minOccurs="1" maxOccurs="1" type="PRICEType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Dealer Margin for the base model without equipment
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>  
+			
+			
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="FACTORYEQUIPMENTType">
+		<xsd:annotation>
+			<xsd:documentation>
+				This is a specification of importer defined dealer equipment and dealer equipment.		
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PRNUMBER" minOccurs="1" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						PR code which uniquely identifies a piece of equipment which should be included
+						in the calculation.							
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:minLength value="1"/>
+						<xsd:maxLength value="4"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="DESCRIPTION" minOccurs="1" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						A textual description of the equipment
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="55"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="STANDARDEQUIPMENT" minOccurs="1" maxOccurs="1" type="xsd:boolean">
+				<xsd:annotation>
+					<xsd:documentation>
+					Is this equipment standard on a given model
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="SALESPRICE" minOccurs="1" maxOccurs="1" type="PRICEType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Equipment sale price
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PARTOFPACKET" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Present if the equipment is part of a package.
+						Will contain the packet id.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="3"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	
+	
+	<xsd:complexType name="PRICEType">
+		<xsd:annotation>
+			<xsd:documentation>
+				This price type holds combinations for a given amount all elements is decimal
+				amounts
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+
+			<xsd:element name="TAX" minOccurs="0" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11"/>
+						<xsd:fractionDigits value="2"/>		
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="VAT" minOccurs="0" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11"/>
+						<xsd:fractionDigits value="2"/>		
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="INCLTAXEXCLVAT" minOccurs="0" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11"/>
+						<xsd:fractionDigits value="2"/>		
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="INCLTAXINCLVAT" minOccurs="0" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11"/>
+						<xsd:fractionDigits value="2"/>		
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="EXCLTAXEXCLVAT" minOccurs="0" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11"/>
+						<xsd:fractionDigits value="2"/>		
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="EXCLTAXINCLVAT" minOccurs="0" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11"/>
+						<xsd:fractionDigits value="2"/>		
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>	
+	</xsd:complexType>	
+</xsd:schema>

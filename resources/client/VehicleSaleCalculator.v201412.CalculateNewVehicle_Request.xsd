@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="MESSAGE">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="REQUEST" minOccurs="1" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="DEALER" minOccurs="1" maxOccurs="1">
+								<xsd:annotation>
+									<xsd:documentation>dealer number prefixed with zeroes</xsd:documentation>
+								</xsd:annotation>
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:length value="5"></xsd:length>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:element>
+							<xsd:element name="USERID" minOccurs="1" maxOccurs="1" type="xsd:string">
+								<xsd:annotation>
+									<xsd:documentation>User's RACF Id</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="VEHICLE" minOccurs="1" maxOccurs="1" type="VEHICLEType" />
+							<xsd:element name="VEHICLESOLDTODEALER" minOccurs="0" maxOccurs="1" type="VEHICLESOLDTODEALERType" />
+							<xsd:element name="ECONOMY" minOccurs="1" maxOccurs="1" type="ECONOMYType" />
+							<xsd:element name="CALCULATIONTYPE" minOccurs="1" maxOccurs="1" type="CALCULATIONTYPEType" />
+						</xsd:sequence>
+
+						<xsd:attribute name="DTD" type="xsd:string" use="required" fixed="VehicleSaleCalculator">
+							<xsd:annotation>
+								<xsd:documentation>The name of the service being invoked</xsd:documentation>
+							</xsd:annotation>
+						</xsd:attribute>
+
+						<xsd:attribute name="NAME" type="xsd:string" use="required" fixed="CalculateNewVehicle">
+							<xsd:annotation>
+								<xsd:documentation>The name of the method being invoked</xsd:documentation>
+							</xsd:annotation>
+						</xsd:attribute>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:complexType name="VEHICLEType">
+		<xsd:annotation>
+			<xsd:documentation>
+				Basic vehicle information. 
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="MODELCODE" minOccurs="1" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Model code (Vogn type) is a fixed 6 alphanumeric
+						code which uniquely identifies the model of a
+						car. Model codes may be reused in
+						different
+						model years.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="6" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="MODELYEAR" minOccurs="1" maxOccurs="1" type="xsd:int">
+				<xsd:annotation>
+					<xsd:documentation>
+						Model year identifies a car model of a specific
+						year.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PRICECODE" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						If not provided, the newest price code for the vehicle is used
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="3" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="COLORCODE" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Alpha numeric code of the selected color of the
+						car. The code is comprised of two pairs for top
+						and bottom.
+
+						If not provided, it is assumed that a free option is chosen
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="4" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="INTERIORCODE" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Alpha numeric code of the interior of the car.
+
+						If not provided, it is assumed that a free option is chosen
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="DOORS" minOccurs="0" maxOccurs="1" type="xsd:int">
+				<xsd:annotation>
+					<xsd:documentation>
+						Set the number of doors of the car.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="PRNO" minOccurs="0" maxOccurs="60">
+				<xsd:complexType>
+					<xsd:annotation>
+						<xsd:documentation>Only valid PR Numbers (equipment codes and configuration codes).</xsd:documentation>
+					</xsd:annotation>
+					<xsd:simpleContent>
+						<xsd:extension base="productNumberType">
+							<xsd:attribute name="PRNOTYPE" use="optional">
+								<xsd:annotation>
+									<xsd:documentation>
+										The type of prnumnber:
+										CNF: Configuration code(styrekode)
+										EQP: Factory Equipment
+													</xsd:documentation>
+								</xsd:annotation>
+								<xsd:simpleType>
+									<xsd:restriction base="xsd:string">
+										<xsd:enumeration value="CNF"></xsd:enumeration>
+										<xsd:enumeration value="EQP"></xsd:enumeration>
+									</xsd:restriction>
+								</xsd:simpleType>
+							</xsd:attribute>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="FACTORYEQUIPMENT" minOccurs="0" maxOccurs="60">
+				<xsd:annotation>
+					<xsd:documentation>
+						Factory equipment is only valid PR Numbers (equipment codes). 
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="3" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="EXCLUDEDSTANDARDEQUIPMENT" minOccurs="0" maxOccurs="10">
+				<xsd:annotation>
+					<xsd:documentation>
+						Factory equipment is only valid PR Numbers (equipment codes). 
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:maxLength value="3" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+
+			<xsd:element name="DEALEREQUIPMENT" minOccurs="0" maxOccurs="unbounded" type="DEALEREQUIPMENTType" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="DEALEREQUIPMENTType">
+		<xsd:annotation>
+			<xsd:documentation>
+				This is a specification of importer defined dealer equipment and dealer equipment.		
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+
+
+			<xsd:element name="SALESPRICEEXCLUDINGVAT" minOccurs="1" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						The actual equipment sales price excluding VAT as specified by the dealer. It might be similar to the 'LISTPRICE'
+						specified by
+						the Importer if 'IMPORTERDEFINED' is 'true'.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="SALESPRICEINCLUDINGVAT" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						The actual equipment sales price including VAT as specified by the dealer. It might be similar to the 'LISTPRICE'
+						specified by
+						the Importer if 'IMPORTERDEFINED' is 'true'.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="LISTPRICEEXCLUDINGVAT" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						The equipment price excluding VAT as specified by the importer. This will only be present if
+						'IMPORTERDEFINED' element is
+						'true'. 
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="IMPORTERDEFINED" minOccurs="1" maxOccurs="1" type="xsd:boolean">
+				<xsd:annotation>
+					<xsd:documentation>
+						Indicates whether the specified equipment is importer defined piece of equipment
+						or a dealer specific piece of equipment.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="VEHICLESOLDTODEALERType">
+		<xsd:annotation>
+			<xsd:documentation>
+				This is the trade-in car as seller might buy as part of the deal.			
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PRICE" minOccurs="1" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="VATAMOUNT" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="OUTSTANDINGDEBT" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="ECONOMYType">
+		<xsd:annotation>
+			<xsd:documentation>
+
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ADDITIONALAMOUNT" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>
+						A list of additional amounts for the customer which the dealer wants to add or subtract from the price economy
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="DELIVERYEXPENSES" minOccurs="1" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						The Delivery expenses without license tag fee	
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="LICENSETAGFEE" minOccurs="1" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						The license tag fee.	
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="CASHONDELIVERY" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="DOWNPAYMENT" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="DISCOUNT" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Dealer's discount amount
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+
+			<xsd:element name="CAMPAIGNCODE" minOccurs="0" maxOccurs="20">
+				<xsd:annotation>
+					<xsd:documentation>
+						A list of campaign codes which may affect the pricing of the vehicle.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="3" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="OVERRIDEType">
+		<xsd:annotation>
+			<xsd:documentation>
+				Describes the fields which can be overridden by the consumer
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="KILOMETERSPERLITER" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						The list of valid values can be retrieved from the service owner
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="5" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="CALCULATIONTYPEType">
+		<xsd:annotation>
+			<xsd:documentation>
+				Describes how the calculation is to be performed
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="CALCULATIONTYPE" minOccurs="1" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="CAR_INCL_VAT_INCL_TAX" />
+						<xsd:enumeration value="CAR_EXCL_VAT_EXCL_TAX" />
+						<xsd:enumeration value="CAR_INCL_VAT_EXCL_TAX" />
+						<xsd:enumeration value="CAR_EXCL_VAT_INCL_TAX" />
+						<xsd:enumeration value="VAN_INCL_VAT_INCL_TAX" />
+						<xsd:enumeration value="VAN_EXCL_VAT_EXCL_TAX" />
+						<xsd:enumeration value="VAN_EXCL_VAT_INCL_TAX" />
+						<xsd:enumeration value="VAN_INCL_VAT_EXCL_TAX" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="TAXCODE" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						The list of valid values can be retrieved from the service owner
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="OVERRIDE" minOccurs="0" maxOccurs="1" type="OVERRIDEType"></xsd:element>
+			<xsd:element name="EXCLUDEAUTOMATICSEARCHOFSTANDARDEQUIPMENT" minOccurs="1" maxOccurs="1" type="xsd:boolean" default="false">
+				<xsd:annotation>
+					<xsd:documentation>
+						Exclude automatic search of standard equipment
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EXCLUDEAUTOMATICSEARCHOFPLUSPACKAGES" minOccurs="1" maxOccurs="1" type="xsd:boolean" default="false">
+				<xsd:annotation>
+					<xsd:documentation>
+						Exclude automatic search of plus packages
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="PRICEType">
+		<xsd:annotation>
+			<xsd:documentation>
+				This price type holds combinations for a given amount all elements is decimal
+				amounts
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PRICE" minOccurs="0" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="TAX" minOccurs="0" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="VAT" minOccurs="0" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="INCLTAXEXCLVAT" minOccurs="0" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="INCLTAXINCLVAT" minOccurs="0" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="EXCLTAXEXCLVAT" minOccurs="0" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="EXCLTAXINCLVAT" minOccurs="0" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="productNumberType">
+		<xsd:restriction base="xsd:string">
+			<xsd:length value="3"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

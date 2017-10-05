@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><wsdl:definitions name="XMLService200903" targetNamespace="http://www.semlernet.dk/xmlns/xmlservice/200903/" xmlns:schema="http://www.semlernet.dk/xmlns/types/xmlservice/200903/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.semlernet.dk/xmlns/xmlservice/200903/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://www.semlernet.dk/xmlns/types/xmlservice/200903/">
+      <xsd:element name="ExecuteServiceRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+          	<xsd:element maxOccurs="1" minOccurs="0" name="consumerId">
+          		<xsd:annotation>
+          			<xsd:documentation>
+          				This is a 13 character alphanumeric Id that
+          				represents the consumer uniquely. This id is
+          				provided by the ESB Administrator and serves
+          				as an authentication identifier for secured
+          				services.
+          			</xsd:documentation>
+          		</xsd:annotation>
+          		<xsd:simpleType>
+          			<xsd:restriction base="xsd:string">
+          				<xsd:length value="13"/>
+          			</xsd:restriction>
+          		</xsd:simpleType>
+          	</xsd:element>
+          	<xsd:element maxOccurs="1" minOccurs="1" name="inputMessage" type="xsd:string">
+          		<xsd:annotation>
+          			<xsd:documentation>This is the input message for the XML Service</xsd:documentation>
+          		</xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ExecuteServiceResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element maxOccurs="1" minOccurs="1" name="outputMessage" type="xsd:string">
+            	<xsd:annotation>
+            		<xsd:documentation>This is the output message for the XML Service</xsd:documentation>
+            	</xsd:annotation>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="ExecuteServiceRequestMsg">
+    <wsdl:part element="schema:ExecuteServiceRequest" name="parameters"/>
+  </wsdl:message>
+  <wsdl:message name="ExecuteServiceResponseMsg">
+    <wsdl:part element="schema:ExecuteServiceResponse" name="parameters"/>
+  </wsdl:message>
+  <wsdl:portType name="XMLService">
+    <wsdl:operation name="ExecuteService">
+      <wsdl:input message="tns:ExecuteServiceRequestMsg"/>
+      <wsdl:output message="tns:ExecuteServiceResponseMsg"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="XMLService200903SOAP" type="tns:XMLService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="ExecuteService">
+      <soap:operation soapAction="http://www.semlernet.dk/xmlns/XMLService/200903/ExecuteService"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="XMLService200903">
+    <wsdl:port binding="tns:XMLService200903SOAP" name="XMLService200903SOAP">
+      <soap:address location="http://testesb.semlernet.dk/xs/serviceVersion/serviceName"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="MESSAGE">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="RESPONSE" minOccurs="1" maxOccurs="1">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:choice minOccurs="1" maxOccurs="1">
+								<xsd:group ref="responseGroup" minOccurs="1" maxOccurs="1" />
+								<xsd:element name="ERROR" type="ErrorType" minOccurs="1" maxOccurs="1" />
+							</xsd:choice>
+						</xsd:sequence>
+
+						<xsd:attribute name="DTD" type="xsd:string" use="required" fixed="VehicleSaleCalculator">
+							<xsd:annotation>
+								<xsd:documentation>The name of the service responding</xsd:documentation>
+							</xsd:annotation>
+						</xsd:attribute>
+
+						<xsd:attribute name="NAME" type="xsd:string" use="required" fixed="CalculateUsedVehicle">
+							<xsd:annotation>
+								<xsd:documentation>The name of the method responding</xsd:documentation>
+							</xsd:annotation>
+						</xsd:attribute>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:complexType name="ErrorDataType" mixed="true">
+		<xsd:sequence>
+			<xsd:any processContents="skip" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+		<xsd:attribute type="xsd:string" name="ID" use="required" />
+	</xsd:complexType>
+
+	<xsd:complexType name="ErrorType">
+		<xsd:annotation>
+			<xsd:documentation>
+				CODE - DESCRIPTION
+				E1001 Dealer number {DEALER=String} is unknown at table {TABLE=String}
+				E1200 Vehicle {VEHICLE=String} does not exist
+
+				E9000 XXXX
+				E9000 XXXX: Transform error XXXX
+				E9002 XXXX: Channel error XXXX XXXX
+				E9002 XXXX: MQ error Comp.code: XXXX Reason: XXXX
+				E9002 XXXX
+				E9003 BackoutCount: MQ error Counter XXXX
+
+				S9080 DATATOXML XXXX
+				S9085 XXXX XXXX
+				S9090 XXXX XXXX
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="TRANSACTIONID" minOccurs="1" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="13"></xsd:length>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="CODE" minOccurs="1" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="5"></xsd:length>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="DESCRIPTION" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="DATA" type="ErrorDataType" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:group name="responseGroup">
+		<xsd:sequence>
+			<xsd:element name="TRANSACTIONID" minOccurs="1" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="13"></xsd:length>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="CALCULATION" minOccurs="1" maxOccurs="1" type="CALCULATIONType" />
+		</xsd:sequence>
+	</xsd:group>
+
+	<xsd:complexType name="CALCULATIONType">
+		<xsd:annotation>
+			<xsd:documentation>
+
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="TOTALPRICE" minOccurs="1" maxOccurs="1" type="PRICEType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Is a medium calculation of sums
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="VEHICLESOLDTODEALERPRICE" minOccurs="1" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Summarized total of the vehicle sold to dealer
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="VEHICLESOLDTODEALERTOTALPRICE" minOccurs="1" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation>
+						Summarized total of the vehicle sold to dealer with outstanding debt deducted
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="GRANDTOTALPRICE" minOccurs="1" maxOccurs="1" type="PRICEType">
+				<xsd:annotation>
+					<xsd:documentation>
+						The grand total which the customer must pay.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="IMPORTERDEFINEDDEALEREQUIPMENTTOTALPRICE" minOccurs="1" maxOccurs="1" type="PRICEType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Summarized total of the importer defined dealer equipment.
+						This is the actual prices specified by the dealer.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="IMPORTERDEFINEDDEALEREQUIPMENTTOTALLISTPRICE" minOccurs="1" maxOccurs="1" type="PRICEType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Summarized total of the importer defined dealer equipment.
+						This is the list prices specified by the importer.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="DEALEREQUIPMENTTOTALPRICE" minOccurs="1" maxOccurs="1" type="PRICEType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Summarized total of the dealer equipment.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EQUIPMENTGRANDTOTALPRICE" minOccurs="1" maxOccurs="1" type="PRICEType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Summarized total of all the equipment.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="PRICEType">
+		<xsd:annotation>
+			<xsd:documentation>
+				This price type holds combinations for a given amount all elements is decimal
+				amounts
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="VAT" minOccurs="0" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="EXCLUDINGVAT" minOccurs="0" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="INCLUDINGVAT" minOccurs="0" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:decimal">
+						<xsd:totalDigits value="11" />
+						<xsd:fractionDigits value="2" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>
